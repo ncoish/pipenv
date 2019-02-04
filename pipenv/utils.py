@@ -210,8 +210,12 @@ def prepare_pip_source_args(sources, pip_args=None):
         pip_args.extend(["-i", package_url])
         # Trust the host if it's not verified.
         if not sources[0].get("verify_ssl", True):
+            package_url = urllib3_util.parse_url(package_url)
+            package_url_string = package_url.host
+            if package_url.port:
+                package_url_string += str(package_url.port)
             pip_args.extend(
-                ["--trusted-host", urllib3_util.parse_url(package_url).host]
+                ["--trusted-host", package_url_string]
             )
         # Add additional sources as extra indexes.
         if len(sources) > 1:
@@ -222,8 +226,12 @@ def prepare_pip_source_args(sources, pip_args=None):
                 pip_args.extend(["--extra-index-url", url])
                 # Trust the host if it's not verified.
                 if not source.get("verify_ssl", True):
+                    url = urllib3_util.parse_url(url)
+                    url_string = url.host
+                    if url.port:
+                        url_string += str(url.port)
                     pip_args.extend(
-                        ["--trusted-host", urllib3_util.parse_url(url).host]
+                        ["--trusted-host", url_string]
                     )
     return pip_args
 
